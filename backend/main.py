@@ -113,9 +113,9 @@ async def call_ai_humanizer(text: str, tone: str, readability: str, mode: str = 
             return text
 
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "system", "content": "You are a helpful assistant that writes like a human."},
-                     {"role": "user", "content": prompt}],
+                       {"role": "user", "content": prompt}],
             temperature=0.7,
             max_tokens=2000
         )
