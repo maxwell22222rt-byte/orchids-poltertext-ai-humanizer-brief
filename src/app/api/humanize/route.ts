@@ -147,27 +147,59 @@ ${text}`;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { text, tone = "professional", readability = "natural", userId = null } = body;
+    const { text, tone = "professional", readability = "natural", model = "ghost-pro", promptStyle = "default", userId = null } = body;
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
     const wordCount = text.trim().split(/\s+/).length;
-    if (wordCount > 5000) {
+    const maxWords = model === "king" ? 10000 : 5000;
+    
+    if (wordCount > maxWords) {
       return NextResponse.json(
-        { error: "Text exceeds 5000 words limit" },
+        { error: `Text exceeds ${maxWords} words limit for ${model}` },
         { status: 400 }
       );
     }
 
-    // 1. Preprocess
+    // Check if backend URL is configured
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+    
+    try {
+      // Forward to FastAPI backend
+      const backendResponse = await fetch(`${backendUrl}/humanize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, tone, readability, model, promptStyle }),
+      });
+
+      if (backendResponse.ok) {
+        const data = await backendResponse.json();
+        
+        // Log to database if connected
+        if (supabaseAdmin) {
+          const { error: logError } = await supabaseAdmin.from("humanizations").insert({
+            user_id: userId,
+            original_text: text,
+            humanized_text: data.humanizedText,
+            tone,
+            readability,
+            word_count: wordCount,
+          });
+
+          if (logError) console.error("Database log error:", logError);
+        }
+
+        return NextResponse.json(data);
+      }
+    } catch (backendError) {
+      console.warn("Backend not available, using fallback:", backendError);
+    }
+
+    // Fallback to inline processing if backend is unavailable
     const cleanedText = ruleBasedPreprocess(text);
-
-    // 2. AI Humanization
     const aiOutput = await callAIHumanizer(cleanedText, tone, readability, "humanize");
-
-    // 3. Postprocess
     const humanizedText = ruleBasedPostprocess(aiOutput);
 
     const apiKeyMissing = !process.env.OPENAI_API_KEY;
@@ -191,7 +223,7 @@ export async function POST(request: NextRequest) {
       wordCount,
       warning: apiKeyMissing
         ? "OpenAI API Key is missing. Using rule-based humanization fallback."
-        : null,
+        : "Using fallback processing (King model requires backend server)",
     });
   } catch (error: any) {
     console.error("Humanization error:", error);

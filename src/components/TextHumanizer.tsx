@@ -10,11 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Ghost, Copy, Download, Loader2, Sparkles, RefreshCw, History as HistoryIcon, Clock, ChevronRight, Wand2, AlertCircle } from "lucide-react";
+import { Ghost, Copy, Download, Loader2, Sparkles, RefreshCw, History as HistoryIcon, Clock, ChevronRight, Wand2, AlertCircle, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const TONES = [
   { value: "academic", label: "Academic" },
@@ -27,6 +28,51 @@ const READABILITY_LEVELS = [
   { value: "high-school", label: "High School" },
   { value: "college", label: "College" },
   { value: "natural", label: "Natural Human" },
+];
+
+const MODELS = [
+  { 
+    value: "ghost-mini", 
+    label: "Ghost Mini", 
+    description: "Fast & Efficient",
+    speed: "2-5 sec",
+    info: "Lightning fast with GPT-4o-mini. Perfect for quick edits and short content."
+  },
+  { 
+    value: "ghost-pro", 
+    label: "Ghost Pro", 
+    description: "Balanced Quality",
+    speed: "5-10 sec",
+    info: "Optimal speed/quality balance with GPT-4o. Great for professional content."
+  },
+  { 
+    value: "king", 
+    label: "King", 
+    description: "Maximum Quality",
+    speed: "10-30 sec",
+    info: "Premium quality with advanced processing. Research-grade humanization up to 10k words."
+  },
+];
+
+const PROMPT_STYLES = [
+  { 
+    value: "default", 
+    label: "Default", 
+    description: "Full humanization",
+    info: "Complete discourse-level transformation with all enhancements"
+  },
+  { 
+    value: "quick", 
+    label: "Quick", 
+    description: "Fast processing",
+    info: "Streamlined processing for faster results"
+  },
+  { 
+    value: "polish", 
+    label: "Polish", 
+    description: "Refine & improve",
+    info: "Focus on flow and structure improvement"
+  },
 ];
 
 interface HistoryItem {
@@ -44,6 +90,8 @@ export function TextHumanizer() {
   const [outputText, setOutputText] = useState("");
   const [tone, setTone] = useState("professional");
   const [readability, setReadability] = useState("natural");
+  const [model, setModel] = useState("ghost-pro");
+  const [promptStyle, setPromptStyle] = useState("default");
   const [mode, setMode] = useState<"humanize" | "paraphrase">("humanize");
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -55,7 +103,34 @@ export function TextHumanizer() {
     const inputWordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
 
   const outputWordCount = outputText.trim() ? outputText.trim().split(/\s+/).length : 0;
-  const isOverLimit = inputWordCount > 5000;
+  const maxWords = model === "king" ? 10000 : 5000;
+  const isOverLimit = inputWordCount > maxWords;
+  
+  // Get current model info
+  const selectedModel = MODELS.find(m => m.value === model);
+  const selectedPromptStyle = PROMPT_STYLES.find(p => p.value === promptStyle);
+  
+  // Calculate estimated processing time
+  const estimatedTime = (() => {
+    if (inputWordCount === 0) return "0 sec";
+    
+    if (model === "ghost-mini") {
+      return inputWordCount < 1000 ? "2-3 sec" : "3-5 sec";
+    } else if (model === "ghost-pro") {
+      return inputWordCount < 1000 ? "5-7 sec" : "7-10 sec";
+    } else { // king
+      if (promptStyle === "quick") {
+        return inputWordCount < 2000 ? "8-10 sec" : "10-15 sec";
+      } else if (promptStyle === "polish") {
+        return inputWordCount < 2000 ? "10-12 sec" : "12-18 sec";
+      } else { // default
+        if (inputWordCount < 1000) return "12-15 sec";
+        if (inputWordCount < 3000) return "15-20 sec";
+        if (inputWordCount < 6000) return "20-28 sec";
+        return "28-35 sec";
+      }
+    }
+  })();
 
   const fetchHistory = useCallback(async () => {
     setIsLoadingHistory(true);
@@ -90,7 +165,7 @@ export function TextHumanizer() {
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: inputText, tone, readability }),
+          body: JSON.stringify({ text: inputText, tone, readability, model, promptStyle }),
         });
   
         if (!response.ok) {
@@ -108,7 +183,7 @@ export function TextHumanizer() {
     } finally {
       setIsProcessing(false);
     }
-  }, [inputText, tone, readability, mode, isOverLimit]);
+  }, [inputText, tone, readability, model, promptStyle, mode, isOverLimit]);
 
   const handleCopy = useCallback(async () => {
     if (!outputText) return;
@@ -144,7 +219,8 @@ export function TextHumanizer() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
+    <TooltipProvider>
+      <div className="w-full max-w-6xl mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
           <TabsList className="bg-card/50 border border-border/30 p-1">
@@ -179,6 +255,27 @@ export function TextHumanizer() {
         </div>
 
           <TabsContent value="editor" className="mt-0">
+            {/* Processing Info Banner */}
+            {inputWordCount > 0 && !isOverLimit && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3 text-sm"
+              >
+                <Info className="w-4 h-4 text-primary shrink-0" />
+                <div className="flex-1">
+                  <p className="text-foreground">
+                    <span className="font-semibold">{selectedModel?.label}</span>
+                    {model === "king" && ` (${selectedPromptStyle?.label} style)`} · 
+                    Estimated time: <span className="font-mono font-semibold text-primary">{estimatedTime}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Powered by pre-trained AI on high-performance GPUs. Pattern transformation, not manual rewriting.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+            
             {warning && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -211,14 +308,14 @@ export function TextHumanizer() {
                   )}
                 </label>
                 <span className={`text-xs font-mono ${isOverLimit ? "text-destructive" : "text-muted-foreground"}`}>
-                  {inputWordCount.toLocaleString()} / 5,000 words
+                  {inputWordCount.toLocaleString()} / {maxWords.toLocaleString()} words
                 </span>
               </div>
               <div className="relative group">
                 <Textarea
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Paste your AI-generated text here (up to 5,000 words)..."
+                  placeholder={`Paste your AI-generated text here (up to ${maxWords.toLocaleString()} words)...`}
                   className={`min-h-[400px] resize-none bg-card/50 border-border/50 focus:border-primary/50 transition-all duration-300 text-base leading-relaxed placeholder:text-muted-foreground/50 font-serif ${isOverLimit ? "border-destructive/50 ring-1 ring-destructive/20" : ""}`}
                 />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 to-transparent rounded-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
@@ -256,9 +353,17 @@ export function TextHumanizer() {
                         >
                           <Ghost className="w-8 h-8 text-primary" />
                         </motion.div>
-                        <span className="text-sm text-muted-foreground">
-                          {mode === "humanize" ? "Haunting your text..." : "Rewriting structure..."}
-                        </span>
+                        <div className="text-center">
+                          <span className="text-sm font-medium text-foreground block">
+                            {mode === "humanize" ? "Humanizing your text..." : "Rewriting structure..."}
+                          </span>
+                          <span className="text-xs text-muted-foreground block mt-1">
+                            {selectedModel?.label} · Est. {estimatedTime}
+                          </span>
+                          <span className="text-xs text-muted-foreground/70 block mt-0.5">
+                            GPU-accelerated processing
+                          </span>
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -270,6 +375,38 @@ export function TextHumanizer() {
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-card/30 rounded-xl border border-border/30 shadow-sm">
             <div className="flex flex-wrap items-center gap-3 flex-1">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Model</label>
+                <Select value={model} onValueChange={setModel}>
+                  <SelectTrigger className="w-[160px] h-9 text-sm bg-card/50 border-border/50">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MODELS.map((m) => (
+                      <SelectItem key={m.value} value={m.value}>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{m.label}</span>
+                            <span className="text-xs text-muted-foreground">⚡ {m.speed}</span>
+                          </div>
+                          <span className="text-xs text-muted-foreground">{m.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="font-semibold mb-1">{selectedModel?.label}</p>
+                    <p className="text-xs">{selectedModel?.info}</p>
+                    <p className="text-xs mt-1 text-muted-foreground">Speed: {selectedModel?.speed}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
               <div className="flex items-center gap-2">
                 <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Tone</label>
                 <Select value={tone} onValueChange={setTone}>
@@ -301,6 +438,27 @@ export function TextHumanizer() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {model === "king" && (
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Style</label>
+                  <Select value={promptStyle} onValueChange={setPromptStyle}>
+                    <SelectTrigger className="w-[150px] h-9 text-sm bg-card/50 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROMPT_STYLES.map((p) => (
+                        <SelectItem key={p.value} value={p.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{p.label}</span>
+                            <span className="text-xs text-muted-foreground">{p.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
@@ -424,5 +582,6 @@ export function TextHumanizer() {
         </TabsContent>
       </Tabs>
     </div>
+    </TooltipProvider>
   );
 }
