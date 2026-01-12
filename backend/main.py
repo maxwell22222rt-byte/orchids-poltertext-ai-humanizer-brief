@@ -233,6 +233,9 @@ def get_king_prompt(text: str, tone: str, readability: str, mode: str, prompt_st
         if mode == "paraphrase":
             return f"""
 Rewrite the following text naturally in English so it reads like a human wrote it while completely restructuring sentences.
+
+IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, examples, or clarifications where appropriate.
+
 Keep meaning intact. Avoid robotic or repetitive phrases. Vary sentence length and style aggressively.
 
 Tone: {tone}, Readability: {readability}
@@ -242,7 +245,10 @@ Text:
 """
         else:
             return f"""
-Rewrite the following text naturally in English so it reads like a human wrote it. 
+Rewrite the following text naturally in English so it reads like a human wrote it.
+
+IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, transitions, or clarifications where appropriate.
+
 Keep meaning intact. Avoid robotic or repetitive phrases. Vary sentence length and style.
 
 Tone: {tone}, Readability: {readability}
@@ -254,7 +260,9 @@ Text:
     elif prompt_style == "polish":
         # Post-Processing Polish Prompt
         return f"""
-You are a text polishing assistant. Refine the following English text to improve flow, readability, and human-like style without changing the meaning. 
+You are a text polishing assistant. Refine the following English text to improve flow, readability, and human-like style without changing the meaning.
+
+IMPORTANT: The output must be 5-10% LONGER than the input. Add natural transitions, elaborations, or clarifying phrases where appropriate.
 
 Guidelines:
 - Vary sentence and paragraph structure.
@@ -273,12 +281,14 @@ Text:
             return f"""
 You are a professional writing assistant. Rewrite the following text aggressively to paraphrase it while sounding naturally human-written in English.
 
+IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, examples, or transitions where appropriate to enhance readability.
+
 Requirements:
 - Completely restructure sentences and use synonyms.
 - Vary sentence length and rhythm naturally.
 - Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally", "Moreover".
 - Use active voice whenever possible.
-- Preserve the exact meaning; do not summarize or add new information.
+- Preserve the exact meaning; expand naturally rather than summarize.
 - Apply discourse-level style transfer with natural imperfections.
 - Apply the tone: {tone}.
 - Apply readability level: {readability}.
@@ -290,11 +300,13 @@ Text:
             return f"""
 You are a professional writing assistant. Rewrite the following text so it sounds naturally human-written in English.
 
+IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, transitions, or clarifying phrases where appropriate to enhance readability.
+
 Requirements:
 - Vary sentence length and rhythm naturally.
 - Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally", "Moreover", "Consequently", "Therefore".
 - Use active voice whenever possible.
-- Preserve the exact meaning; do not summarize or add new information.
+- Preserve the exact meaning; expand naturally rather than summarize.
 - Apply the tone: {tone}.
 - Apply readability level: {readability}.
 
@@ -381,11 +393,13 @@ async def call_ai_humanizer(text: str, tone: str, readability: str, mode: str = 
         prompt = f"""
         You are a professional writing assistant. Rewrite the following text aggressively to paraphrase it while sounding naturally human-written.
 
+        IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations or transitions where appropriate.
+
         Requirements:
         - Completely restructure sentences and use synonyms.
         - Vary sentence length and rhythm.
         - Avoid repetitive AI-style phrases.
-        - Preserve the exact meaning; do not summarize.
+        - Preserve the exact meaning; expand naturally rather than summarize.
         - Apply the tone: {tone}.
         - Apply readability level: {readability}.
 
@@ -397,11 +411,13 @@ async def call_ai_humanizer(text: str, tone: str, readability: str, mode: str = 
         prompt = f"""
         You are a professional writing assistant. Rewrite the following text so it sounds naturally human-written.
 
+        IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, transitions, or clarifying phrases where appropriate.
+
         Requirements:
         - Vary sentence length and rhythm.
         - Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally".
         - Use active voice whenever possible.
-        - Preserve the exact meaning; do not summarize or add new information.
+        - Preserve the exact meaning; expand naturally rather than summarize.
         - Apply the tone: {tone}.
         - Apply readability level: {readability}.
 
