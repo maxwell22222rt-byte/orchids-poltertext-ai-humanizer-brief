@@ -1,9 +1,3 @@
 {
-  "buildCommand": "npm run build",
-  "rewrites": [
-    {
-      "source": "/api/backend/:path*",
-      "destination": "/backend/main.py"
-    }
-  ]
+  "buildCommand": "npm run build"
 }
