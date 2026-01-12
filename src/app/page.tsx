@@ -78,32 +78,32 @@ export default function Home() {
       </div>
 
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Ghost className="w-7 h-7 text-primary" />
-            <span className="text-xl font-semibold tracking-tight">PolterText</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <Ghost className="w-6 h-6 sm:w-7 sm:h-7 text-primary" />
+            <span className="text-lg sm:text-xl font-bold tracking-tight">PolterText</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
             <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
             <a href="#editor" className="hover:text-foreground transition-colors">Editor</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">Sign In</Button>
-            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">Get Started</Button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button variant="ghost" size="sm" className="text-muted-foreground font-medium hidden sm:inline-flex">Sign In</Button>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-xs sm:text-sm px-3 sm:px-4">Get Started</Button>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="pt-32 pb-20 px-6">
+        <section className="pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Badge variant="outline" className="mb-6 px-4 py-1.5 text-xs uppercase tracking-widest border-primary/30 text-primary">
+              <Badge variant="outline" className="mb-6 sm:mb-8 px-3 sm:px-4 py-1.5 sm:py-2 text-xs uppercase tracking-widest border-primary/30 text-primary font-semibold">
                 AI Text Humanizer
               </Badge>
             </motion.div>
@@ -112,17 +112,17 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1]"
+              className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-4 sm:mb-6 leading-[1.1]"
             >
               Make Your Text
-              <span className="block text-primary">Invisibly Human</span>
+              <span className="block text-primary mt-2">Invisibly Human</span>
             </motion.h1>
             
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
+              className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-4"
             >
               Transform AI-generated content into naturally flowing human text. 
               Stealthy, fast, and undetectable—like a ghost in your words.
@@ -132,20 +132,20 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap items-center justify-center gap-4"
+              className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 px-4"
             >
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-12 px-8 text-base">
-                <Sparkles className="w-4 h-4 mr-2" />
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base font-semibold w-full sm:w-auto">
+                <Sparkles className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
                 Try It Free
               </Button>
-              <Button size="lg" variant="outline" className="h-12 px-8 text-base border-border/50 bg-card/30">
+              <Button size="lg" variant="outline" className="h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base font-semibold border-border/50 bg-card/30 hover:bg-card/50 w-full sm:w-auto">
                 See How It Works
               </Button>
             </motion.div>
           </div>
         </section>
 
-        <section id="editor" className="py-16 px-6">
+        <section id="editor" className="py-12 sm:py-16 px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -156,22 +156,22 @@ export default function Home() {
           </motion.div>
         </section>
 
-        <section id="features" className="py-24 px-6">
+        <section id="features" className="py-16 sm:py-24 px-4 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+              className="text-center mb-12 sm:mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Why PolterText?</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Why Choose PolterText?</h2>
+              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto px-4">
                 A sophisticated blend of rule-based processing and AI refinement for natural, undetectable output.
               </p>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
@@ -228,20 +228,20 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="pricing" className="py-24 px-6 border-t border-border/30">
+        <section id="pricing" className="py-16 sm:py-24 px-4 sm:px-6 border-t border-border/30">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="text-center mb-16"
+              className="text-center mb-12 sm:mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple Pricing</h2>
-              <p className="text-muted-foreground text-lg">Choose the plan that fits your needs</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Simple, Transparent Pricing</h2>
+              <p className="text-muted-foreground text-base sm:text-lg">Choose the plan that fits your needs</p>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {pricingPlans.map((plan, index) => (
                 <motion.div
                   key={plan.name}
@@ -249,33 +249,35 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`relative p-6 rounded-2xl border transition-all duration-300 ${
+                  className={`relative p-6 rounded-2xl border transition-all duration-300 flex flex-col h-full ${
                     plan.popular 
                       ? "bg-primary/5 border-primary/50 shadow-lg shadow-primary/10" 
                       : "bg-card/30 border-border/30 hover:border-primary/30"
                   }`}
                 >
                   {plan.popular && (
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground font-semibold">
                       Most Popular
                     </Badge>
                   )}
-                  <h3 className="text-lg font-semibold mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-muted-foreground text-sm">{plan.period}</span>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                    <div className="flex items-baseline gap-1 mb-3">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-muted-foreground text-sm">{plan.period}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{plan.description}</p>
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2 text-sm">
+                          <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
-                  <ul className="space-y-3 mb-6">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-primary shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
                   <Button 
-                    className={`w-full ${
+                    className={`w-full font-semibold ${
                       plan.popular 
                         ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                         : "bg-card hover:bg-accent border border-border/50"
@@ -310,19 +312,19 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="py-12 px-6 border-t border-border/30">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Ghost className="w-5 h-5 text-primary" />
-            <span className="font-semibold">PolterText</span>
+      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-border/30">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 text-center md:text-left">
+          <div className="flex items-center gap-2.5">
+            <Ghost className="w-5 sm:w-6 h-5 sm:h-6 text-primary" />
+            <span className="font-bold text-base sm:text-lg">PolterText</span>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Polish AI-assisted writing. Improve readability & naturalness.
           </p>
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-            <a href="#" className="hover:text-foreground transition-colors">Contact</a>
+          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-muted-foreground">
+            <a href="#" className="hover:text-foreground transition-colors font-medium">Privacy</a>
+            <a href="#" className="hover:text-foreground transition-colors font-medium">Terms</a>
+            <a href="#" className="hover:text-foreground transition-colors font-medium">Contact</a>
           </div>
         </div>
       </footer>

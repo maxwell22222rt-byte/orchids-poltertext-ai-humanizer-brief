@@ -52,7 +52,12 @@ const MODELS = [
     speed: "10-30 sec",
     info: "Premium quality with advanced processing. Research-grade humanization up to 10k words."
   },
-];
+] as const;
+
+// Debug: Log models on load
+if (typeof window !== 'undefined') {
+  console.log('🔍 MODELS Array:', MODELS.map(m => m.value));
+}
 
 const PROMPT_STYLES = [
   { 
@@ -222,24 +227,24 @@ export function TextHumanizer() {
     <TooltipProvider>
       <div className="w-full max-w-6xl mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
-          <TabsList className="bg-card/50 border border-border/30 p-1">
-            <TabsTrigger value="editor" className="flex items-center gap-2 px-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+          <TabsList className="bg-card/50 border border-border/30 p-1 h-11">
+            <TabsTrigger value="editor" className="flex items-center gap-2 px-6 h-9 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Sparkles className="w-4 h-4" />
-              Editor
+              <span className="font-medium">Editor</span>
             </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2 px-6">
+            <TabsTrigger value="history" className="flex items-center gap-2 px-6 h-9 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <HistoryIcon className="w-4 h-4" />
-              History
+              <span className="font-medium">History</span>
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex items-center gap-2 p-1 bg-card/50 border border-border/30 rounded-lg">
+          <div className="flex items-center gap-1 p-1 bg-card/50 border border-border/30 rounded-lg h-11">
             <Button
               variant={mode === "humanize" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setMode("humanize")}
-              className="text-xs h-8"
+              className="text-sm h-9 px-4 font-medium"
             >
               Humanize
             </Button>
@@ -247,7 +252,7 @@ export function TextHumanizer() {
               variant={mode === "paraphrase" ? "secondary" : "ghost"}
               size="sm"
               onClick={() => setMode("paraphrase")}
-              className="text-xs h-8"
+              className="text-sm h-9 px-4 font-medium"
             >
               Paraphrase
             </Button>
@@ -297,17 +302,17 @@ export function TextHumanizer() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
 
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
                   Input Text
                   {isOverLimit && (
                     <Badge variant="destructive" className="h-5 text-[10px] animate-pulse">
                       <AlertCircle className="w-3 h-3 mr-1" />
-                      Over 5,000 words limit
+                      Over Limit
                     </Badge>
                   )}
                 </label>
-                <span className={`text-xs font-mono ${isOverLimit ? "text-destructive" : "text-muted-foreground"}`}>
+                <span className={`text-xs font-mono ${isOverLimit ? "text-destructive font-semibold" : "text-muted-foreground"}`}>
                   {inputWordCount.toLocaleString()} / {maxWords.toLocaleString()} words
                 </span>
               </div>
@@ -316,15 +321,15 @@ export function TextHumanizer() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder={`Paste your AI-generated text here (up to ${maxWords.toLocaleString()} words)...`}
-                  className={`min-h-[400px] resize-none bg-card/50 border-border/50 focus:border-primary/50 transition-all duration-300 text-base leading-relaxed placeholder:text-muted-foreground/50 font-serif ${isOverLimit ? "border-destructive/50 ring-1 ring-destructive/20" : ""}`}
+                  className={`min-h-[300px] sm:min-h-[400px] resize-none bg-card/50 border-border/50 focus:border-primary/50 transition-all duration-300 text-[15px] leading-relaxed placeholder:text-muted-foreground/50 font-serif ${isOverLimit ? "border-destructive/50 ring-2 ring-destructive/20" : ""}`}
                 />
                 <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 to-transparent rounded-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-semibold text-foreground">
                   {mode === "humanize" ? "Humanized" : "Paraphrased"} Output
                 </label>
                 <span className="text-xs text-muted-foreground font-mono">
@@ -336,7 +341,7 @@ export function TextHumanizer() {
                   value={outputText}
                   readOnly
                   placeholder={`Your ${mode}d text will appear here...`}
-                  className="min-h-[400px] resize-none bg-card/50 border-border/50 text-base leading-relaxed placeholder:text-muted-foreground/50 font-serif"
+                  className="min-h-[300px] sm:min-h-[400px] resize-none bg-card/50 border-border/50 text-[15px] leading-relaxed placeholder:text-muted-foreground/50 font-serif"
                 />
                 <AnimatePresence>
                   {isProcessing && (
@@ -344,24 +349,24 @@ export function TextHumanizer() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="absolute inset-0 flex items-center justify-center bg-card/80 backdrop-blur-sm rounded-lg"
+                      className="absolute inset-0 flex items-center justify-center bg-card/90 backdrop-blur-sm rounded-lg z-10"
                     >
-                      <div className="flex flex-col items-center gap-3">
+                      <div className="flex flex-col items-center gap-4 p-6">
                         <motion.div
                           animate={{ rotate: 360 }}
                           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                         >
-                          <Ghost className="w-8 h-8 text-primary" />
+                          <Ghost className="w-10 h-10 text-primary" />
                         </motion.div>
-                        <div className="text-center">
-                          <span className="text-sm font-medium text-foreground block">
-                            {mode === "humanize" ? "Humanizing your text..." : "Rewriting structure..."}
+                        <div className="text-center space-y-1">
+                          <span className="text-base font-semibold text-foreground block">
+                            {mode === "humanize" ? "Humanizing Your Text..." : "Rewriting Structure..."}
                           </span>
-                          <span className="text-xs text-muted-foreground block mt-1">
+                          <span className="text-sm text-muted-foreground block">
                             {selectedModel?.label} · Est. {estimatedTime}
                           </span>
-                          <span className="text-xs text-muted-foreground/70 block mt-0.5">
-                            GPU-accelerated processing
+                          <span className="text-xs text-muted-foreground/70 block">
+                            GPU-Accelerated Processing
                           </span>
                         </div>
                       </div>
@@ -373,26 +378,29 @@ export function TextHumanizer() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-card/30 rounded-xl border border-border/30 shadow-sm">
-            <div className="flex flex-wrap items-center gap-3 flex-1">
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Model</label>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 sm:p-4 bg-card/30 rounded-xl border border-border/30 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 flex-1 w-full">
+              <div className="flex items-center gap-2 flex-1 min-w-[140px]">
+                <label className="text-xs font-medium text-foreground whitespace-nowrap">Model</label>
                 <Select value={model} onValueChange={setModel}>
-                  <SelectTrigger className="w-[160px] h-9 text-sm bg-card/50 border-border/50">
+                  <SelectTrigger className="w-full sm:w-[160px] h-9 text-sm bg-card/50 border-border/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {MODELS.map((m) => (
-                      <SelectItem key={m.value} value={m.value}>
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{m.label}</span>
-                            <span className="text-xs text-muted-foreground">⚡ {m.speed}</span>
+                    {MODELS.map((m) => {
+                      console.log('🔍 Rendering model option:', m.value, m.label);
+                      return (
+                        <SelectItem key={m.value} value={m.value}>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium">{m.label}</span>
+                              <span className="text-xs text-muted-foreground">⚡ {m.speed}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{m.description}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground">{m.description}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <Tooltip>
@@ -407,10 +415,10 @@ export function TextHumanizer() {
                 </Tooltip>
               </div>
 
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Tone</label>
+              <div className="flex items-center gap-2 flex-1 min-w-[120px]">
+                <label className="text-xs font-medium text-foreground whitespace-nowrap">Tone</label>
                 <Select value={tone} onValueChange={setTone}>
-                  <SelectTrigger className="w-[140px] h-9 text-sm bg-card/50 border-border/50">
+                  <SelectTrigger className="w-full sm:w-[140px] h-9 text-sm bg-card/50 border-border/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -423,10 +431,10 @@ export function TextHumanizer() {
                 </Select>
               </div>
 
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Level</label>
+              <div className="flex items-center gap-2 flex-1 min-w-[130px]">
+                <label className="text-xs font-medium text-foreground whitespace-nowrap">Level</label>
                 <Select value={readability} onValueChange={setReadability}>
-                  <SelectTrigger className="w-[150px] h-9 text-sm bg-card/50 border-border/50">
+                  <SelectTrigger className="w-full sm:w-[150px] h-9 text-sm bg-card/50 border-border/50">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -440,10 +448,10 @@ export function TextHumanizer() {
               </div>
 
               {model === "king" && (
-                <div className="flex items-center gap-2">
-                  <label className="text-xs text-muted-foreground uppercase tracking-wider whitespace-nowrap">Style</label>
+                <div className="flex items-center gap-2 flex-1 min-w-[130px]">
+                  <label className="text-xs font-medium text-foreground whitespace-nowrap">Style</label>
                   <Select value={promptStyle} onValueChange={setPromptStyle}>
-                    <SelectTrigger className="w-[150px] h-9 text-sm bg-card/50 border-border/50">
+                    <SelectTrigger className="w-full sm:w-[150px] h-9 text-sm bg-card/50 border-border/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -461,47 +469,65 @@ export function TextHumanizer() {
               )}
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                disabled={!inputText && !outputText}
-                className="text-muted-foreground hover:text-foreground h-9"
-              >
-                <RefreshCw className="w-4 h-4" />
-              </Button>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                disabled={!outputText}
-                className="text-muted-foreground hover:text-foreground h-9"
-              >
-                <Copy className="w-4 h-4" />
-                {copied && <span className="ml-1 text-xs text-primary">Copied!</span>}
-              </Button>
+            <div className="flex items-center gap-2 w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-border/30 pt-3 sm:pt-0 sm:pl-4 sm:ml-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClear}
+                      disabled={!inputText && !outputText}
+                      className="text-muted-foreground hover:text-foreground h-9 w-9 sm:w-auto sm:px-3 p-0 sm:p-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Clear All</TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleCopy}
+                      disabled={!outputText}
+                      className="text-muted-foreground hover:text-foreground h-9 px-2 sm:px-3"
+                    >
+                      <Copy className="w-4 h-4" />
+                      {copied && <span className="ml-1 text-xs text-primary font-medium hidden sm:inline">Copied!</span>}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Copy to Clipboard</TooltipContent>
+                </Tooltip>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDownload}
-                disabled={!outputText}
-                className="text-muted-foreground hover:text-foreground h-9"
-              >
-                <Download className="w-4 h-4" />
-              </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDownload}
+                      disabled={!outputText}
+                      className="text-muted-foreground hover:text-foreground h-9 w-9 sm:w-auto sm:px-3 p-0 sm:p-2"
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Download Text</TooltipContent>
+                </Tooltip>
+              </div>
 
               <Button
                 onClick={handleProcess}
                 disabled={!inputText.trim() || isProcessing || isOverLimit}
-                className="ml-auto sm:ml-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 h-9"
+                className="flex-1 sm:flex-initial sm:ml-auto bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 h-10 px-4 sm:px-6 font-medium text-sm"
               >
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Processing
+                    <span className="hidden sm:inline">Processing</span>
+                    <span className="sm:hidden">Wait...</span>
                   </>
                 ) : mode === "humanize" ? (
                   <>
@@ -522,8 +548,8 @@ export function TextHumanizer() {
         <TabsContent value="history" className="mt-0">
           <div className="bg-card/30 border border-border/30 rounded-2xl overflow-hidden shadow-sm">
             <div className="p-6 border-b border-border/30 flex items-center justify-between bg-card/50">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
                 Recent Activity
               </h3>
               <Button variant="ghost" size="sm" onClick={fetchHistory} disabled={isLoadingHistory}>
@@ -550,24 +576,27 @@ export function TextHumanizer() {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-                            {item.tone} • {item.readability}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground uppercase">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Badge variant="outline" className="text-[10px] font-medium border-primary/30 text-primary">
+                            {item.tone}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px] font-medium border-border/50">
+                            {item.readability}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
                           </span>
                         </div>
-                        <p className="text-sm text-foreground font-serif line-clamp-2 italic mb-2 text-muted-foreground/80">
+                        <p className="text-sm text-muted-foreground font-serif line-clamp-2 mb-2">
                           "{item.original_text.slice(0, 150)}..."
                         </p>
-                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
-                          <span className="flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-primary/40" />
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                             {item.word_count} words
                           </span>
-                          <span className="flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-primary/40" />
+                          <span className="flex items-center gap-1.5 text-primary/70">
+                            <ChevronRight className="w-3 h-3" />
                             Click to restore
                           </span>
                         </div>

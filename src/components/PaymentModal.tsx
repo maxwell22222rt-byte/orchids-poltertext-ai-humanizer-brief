@@ -94,68 +94,76 @@ export function PaymentModal({ isOpen, onClose, amount, planName }: PaymentModal
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-primary" />
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader className="space-y-3">
+          <DialogTitle className="flex items-center gap-2.5 text-xl font-bold">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <CreditCard className="w-5 h-5 text-primary" />
+            </div>
             Complete Payment
           </DialogTitle>
-          <DialogDescription>
-            Pay KES {amount.toLocaleString()} for {planName} plan via M-Pesa
+          <DialogDescription className="text-base">
+            Pay <span className="font-semibold text-foreground">KES {amount.toLocaleString()}</span> for <span className="font-semibold text-foreground">{planName}</span> plan via M-Pesa
           </DialogDescription>
         </DialogHeader>
 
         {success ? (
           <div className="py-8">
-            <Alert className="border-green-500/50 bg-green-50 dark:bg-green-950">
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-800 dark:text-green-200">
-                Payment request sent to {formattedPhone}. Please check your phone and enter your M-Pesa PIN.
+            <Alert className="border-green-500/50 bg-green-50 dark:bg-green-950/50">
+              <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <AlertDescription className="text-green-800 dark:text-green-200 text-base leading-relaxed">
+                Payment request sent to <span className="font-semibold">{formattedPhone}</span>. Please check your phone and enter your M-Pesa PIN to complete the transaction.
               </AlertDescription>
             </Alert>
           </div>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="phone">M-Pesa Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="0712345678"
-                  value={phoneNumber}
-                  onChange={(e) => handlePhoneChange(e.target.value)}
-                  disabled={isLoading}
-                  className="text-base"
-                />
-                {formattedPhone && (
-                  <p className="text-xs text-muted-foreground">
-                    Will be sent to: {formattedPhone}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Enter your Safaricom, Airtel, or Telkom number
-                </p>
-              </div>
-
-              {error && (
-                <Alert variant="destructive">
-                  <XCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-3">
+              <Label htmlFor="phone" className="text-sm font-semibold">M-Pesa Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="0712345678"
+                value={phoneNumber}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                disabled={isLoading}
+                className="text-base h-11"
+              />
+              {formattedPhone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="text-muted-foreground">
+                    Will be sent to: <span className="font-semibold text-foreground">{formattedPhone}</span>
+                  </span>
+                </div>
               )}
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Enter your Safaricom, Airtel, or Telkom phone number
+              </p>
             </div>
 
-            <DialogFooter>
+            {error && (
+              <Alert variant="destructive" className="border-destructive/50">
+                <XCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <DialogFooter className="gap-3 sm:gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="font-medium"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading || !phoneNumber}>
+              <Button 
+                type="submit" 
+                disabled={isLoading || !phoneNumber}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold min-w-[140px]"
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
