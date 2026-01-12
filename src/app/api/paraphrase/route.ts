@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call FastAPI backend
-    const fastApiRes = await fetch("http://127.0.0.1:8000/paraphrase", {
+    const fastApiRes = await fetch("http://localhost:8000/paraphrase", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, tone, readability }),

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call FastAPI backend
-    const fastApiRes = await fetch("http://127.0.0.1:8000/humanize", {
+    const fastApiRes = await fetch("http://localhost:8000/humanize", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, tone, readability }),
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Check backend health for API key status
     let apiKeyMissing = false;
     try {
-      const healthRes = await fetch("http://127.0.0.1:8000/health");
+      const healthRes = await fetch("http://localhost:8000/health");
       if (healthRes.ok) {
         const healthData = await healthRes.json();
         apiKeyMissing = !healthData.openai_api_key_set;
