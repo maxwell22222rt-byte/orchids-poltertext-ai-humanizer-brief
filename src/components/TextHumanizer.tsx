@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -104,6 +104,15 @@ export function TextHumanizer() {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [activeTab, setActiveTab] = useState("editor");
     const [warning, setWarning] = useState<string | null>(null);
+  const outputTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize output textarea
+  useEffect(() => {
+    if (outputTextareaRef.current) {
+      outputTextareaRef.current.style.height = 'auto';
+      outputTextareaRef.current.style.height = Math.max(400, outputTextareaRef.current.scrollHeight) + 'px';
+    }
+  }, [outputText]);
 
     const inputWordCount = inputText.trim() ? inputText.trim().split(/\s+/).length : 0;
 
@@ -338,10 +347,11 @@ export function TextHumanizer() {
               </div>
               <div className="relative group">
                 <Textarea
+                  ref={outputTextareaRef}
                   value={outputText}
                   readOnly
                   placeholder={`Your ${mode}d text will appear here...`}
-                  className="min-h-[300px] sm:min-h-[400px] resize-none bg-card/50 border-border/50 text-[15px] leading-relaxed placeholder:text-muted-foreground/50 font-serif"
+                  className="min-h-[400px] resize-none bg-card/50 border-border/50 text-base leading-relaxed placeholder:text-muted-foreground/50 font-serif overflow-hidden"
                 />
                 <AnimatePresence>
                   {isProcessing && (

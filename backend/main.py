@@ -260,16 +260,21 @@ Text:
     elif prompt_style == "polish":
         # Post-Processing Polish Prompt
         return f"""
-You are a text polishing assistant. Refine the following English text to improve flow, readability, and human-like style without changing the meaning.
+You are a text polishing assistant. Refine the following English text to sound authentically human while improving flow.
 
-IMPORTANT: The output must be 5-10% LONGER than the input. Add natural transitions, elaborations, or clarifying phrases where appropriate.
+IMPORTANT: The output must be 5-10% LONGER than the input.
 
-Guidelines:
-- Vary sentence and paragraph structure.
-- Remove or replace robotic/formulaic phrases.
-- Tone: {tone}.
-- Readability: {readability}.
-- Preserve original content; do not summarize or invent new information.
+ANTI-DETECTION POLISHING:
+- Increase perplexity: use less predictable word choices
+- Maximize burstiness: alternate between short punchy sentences and complex ones
+- Inject imperfection: add slight redundancies or tangential thoughts
+- Break syntactic symmetry: use varied clause structures, fragments, run-ons
+- Remove "too perfect" transitions - make some connections implicit
+- Add personality markers: occasional hedging, emphasis, or casual asides
+- Include parse tree variety: mix canonical and non-canonical structures
+- Let discourse flow be slightly imperfect - humans drift and refocus
+
+Tone: {tone}, Readability: {readability}
 
 Text:
 {text}
@@ -279,36 +284,91 @@ Text:
         # Default English Humanizer Prompt (Enhanced)
         if mode == "paraphrase":
             return f"""
-You are a professional writing assistant. Rewrite the following text aggressively to paraphrase it while sounding naturally human-written in English.
+You are a professional writing assistant. Rewrite the following text to sound genuinely human-written.
 
-IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, examples, or transitions where appropriate to enhance readability.
+IMPORTANT: The output must be 5-10% LONGER than the input.
 
-Requirements:
-- Completely restructure sentences and use synonyms.
-- Vary sentence length and rhythm naturally.
-- Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally", "Moreover".
-- Use active voice whenever possible.
-- Preserve the exact meaning; expand naturally rather than summarize.
-- Apply discourse-level style transfer with natural imperfections.
-- Apply the tone: {tone}.
-- Apply readability level: {readability}.
+AI DETECTION BYPASS - CRITICAL STRATEGIES:
+
+1. TOKEN-LEVEL UNPREDICTABILITY:
+   - Use low-probability word transitions occasionally
+   - Include rare but contextually appropriate vocabulary
+   - Mix safe and surprising lexical choices
+
+2. PERPLEXITY & BURSTINESS:
+   - Create high perplexity through unpredictable phrasing
+   - Vary sentence length dramatically: 5 words → 35 words → 8 words
+   - Alternate between simple and complex structures erratically
+
+3. PHRASE-LEVEL AUTHENTICITY:
+   - NEVER use: "it is important to note", "in today's world", "furthermore", "moreover", "this highlights"
+   - Use natural transitions: "look", "thing is", "what's interesting", "actually"
+   - Include incomplete or rephrased thoughts
+
+4. SENTENCE STRUCTURE VARIETY:
+   - Mix fragments with complete sentences
+   - Use interruptions: dashes, parentheticals
+   - Include non-canonical structures
+   - Add occasional run-on sentences
+
+5. DISCOURSE IMPERFECTION:
+   - Let the text drift slightly before refocusing
+   - Don't over-explain - trust context
+   - Use imperfect logical flow
+   - Add tangential remarks
+
+6. COGNITIVE NOISE:
+   - Include hedging: "maybe", "probably", "I think"
+   - Add emphasis: "really", "definitely", "honestly"
+   - Show self-correction: "well, actually" or "or rather"
+
+Tone: {tone}, Readability: {readability}
 
 Text:
 {text}
 """
         else:
             return f"""
-You are a professional writing assistant. Rewrite the following text so it sounds naturally human-written in English.
+You are a professional writing assistant. Transform the following text to sound authentically human-written.
 
-IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, transitions, or clarifying phrases where appropriate to enhance readability.
+IMPORTANT: The output must be 5-10% LONGER than the input.
 
-Requirements:
-- Vary sentence length and rhythm naturally.
-- Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally", "Moreover", "Consequently", "Therefore".
-- Use active voice whenever possible.
-- Preserve the exact meaning; expand naturally rather than summarize.
-- Apply the tone: {tone}.
-- Apply readability level: {readability}.
+COMPREHENSIVE AI DETECTION BYPASS:
+
+1. STATISTICAL UNPREDICTABILITY:
+   - Inject token-level surprises (rare words, unexpected collocations)
+   - Increase average token entropy
+   - Create long-range probability variance
+
+2. BURSTINESS MAXIMIZATION:
+   - Extreme sentence length variation (3-word fragments + 40-word sentences)
+   - Inconsistent complexity patterns
+   - Erratic structural shifts
+
+3. ANTI-PHRASE DETECTION:
+   - Eliminate ALL AI clichés: "it is important", "in conclusion", "furthermore", "moreover", "this highlights", "in today's world"
+   - Use natural hedging: "sort of", "maybe", "I guess"
+   - Include conversational markers: "look", "honestly", "you know"
+
+4. SYNTACTIC DIVERSITY:
+   - Mix sentence fragments deliberately
+   - Use parenthetical interruptions
+   - Include mid-sentence corrections or shifts
+   - Vary clause depth unpredictably
+
+5. IMPERFECT COHERENCE:
+   - Allow slight topic drift then refocus
+   - Use implicit rather than explicit connections
+   - Include tangential observations
+   - Show natural thought progression with minor detours
+
+6. HUMAN COGNITIVE MARKERS:
+   - Add hesitation markers naturally: "maybe", "probably", "not entirely sure"
+   - Include self-corrections: "well, actually" or "or rather"
+   - Show emotional inconsistency subtly
+   - Use emphasis markers: "really", "definitely", "absolutely"
+
+Tone: {tone}, Readability: {readability}
 
 Text:
 {text}
@@ -391,17 +451,21 @@ async def call_ai_humanizer(text: str, tone: str, readability: str, mode: str = 
         prompt = get_king_prompt(text, tone, readability, mode, prompt_style)
     elif mode == "paraphrase":
         prompt = f"""
-        You are a professional writing assistant. Rewrite the following text aggressively to paraphrase it while sounding naturally human-written.
+        You are a professional writing assistant. Rewrite the following text to sound authentically human.
 
-        IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations or transitions where appropriate.
+        IMPORTANT: The output must be 5-10% LONGER than the input.
 
-        Requirements:
-        - Completely restructure sentences and use synonyms.
-        - Vary sentence length and rhythm.
-        - Avoid repetitive AI-style phrases.
-        - Preserve the exact meaning; expand naturally rather than summarize.
-        - Apply the tone: {tone}.
-        - Apply readability level: {readability}.
+        ANTI-DETECTION ESSENTIALS:
+        - Vary sentence length dramatically (mix short fragments with long complex sentences)
+        - Use unexpected word choices occasionally
+        - Include sentence fragments or incomplete thoughts
+        - Add natural hesitation markers: "maybe", "I think", "probably"
+        - Avoid AI phrases: "it is important to note", "furthermore", "in today's world", "this highlights"
+        - Use imperfect transitions - don't connect everything explicitly
+        - Mix formal and casual tones unpredictably
+        - Include slight tangents or self-corrections
+        
+        Tone: {tone}, Readability: {readability}
 
         Text:
         {text}
@@ -409,17 +473,21 @@ async def call_ai_humanizer(text: str, tone: str, readability: str, mode: str = 
     else:
         # Default Humanizer Prompt
         prompt = f"""
-        You are a professional writing assistant. Rewrite the following text so it sounds naturally human-written.
+        You are a professional writing assistant. Rewrite the following text to sound genuinely human-written.
 
-        IMPORTANT: The output must be 5-10% LONGER than the input. Add natural elaborations, transitions, or clarifying phrases where appropriate.
+        IMPORTANT: The output must be 5-10% LONGER than the input.
 
-        Requirements:
-        - Vary sentence length and rhythm.
-        - Avoid repetitive AI-style phrases such as "In conclusion", "It is important to note that", "Furthermore", "Additionally".
-        - Use active voice whenever possible.
-        - Preserve the exact meaning; expand naturally rather than summarize.
-        - Apply the tone: {tone}.
-        - Apply readability level: {readability}.
+        KEY ANTI-DETECTION STRATEGIES:
+        - High burstiness: alternate between very short (3-5 word) and very long (30-40 word) sentences
+        - Increase perplexity: use less predictable word choices
+        - Inject imperfection: include fragments, interruptions, or slight redundancies
+        - Add cognitive markers: "maybe", "I think", "honestly", "you know"
+        - Eliminate AI clichés: "it is important to note", "in conclusion", "furthermore", "moreover", "this highlights"
+        - Vary structure: mix canonical sentences with fragments and run-ons
+        - Imperfect coherence: allow slight topic drift before refocusing
+        - Natural hesitation: include hedging and emphasis markers
+        
+        Tone: {tone}, Readability: {readability}
 
         Text:
         {text}
