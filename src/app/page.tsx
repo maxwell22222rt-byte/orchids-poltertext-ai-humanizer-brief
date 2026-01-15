@@ -1,6 +1,5 @@
 "use client";
 
-import { TextHumanizer } from "@/components/TextHumanizer";
 import { Ghost, Zap, Shield, Sparkles, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -86,7 +85,7 @@ export default function Home() {
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Features</a>
             <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
-            <a href="#editor" className="hover:text-foreground transition-colors">Editor</a>
+            <a href="https://atomwriters.com" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">Humanize Text</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <Button variant="ghost" size="sm" className="text-muted-foreground font-medium hidden sm:inline-flex">Sign In</Button>
@@ -134,9 +133,11 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 px-4"
             >
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base font-semibold w-full sm:w-auto">
-                <Sparkles className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
-                Try It Free
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base font-semibold w-full sm:w-auto" asChild>
+                <a href="https://atomwriters.com" target="_blank" rel="noopener noreferrer">
+                  <Sparkles className="w-4 sm:w-5 h-4 sm:h-5 mr-2" />
+                  Humanize Text
+                </a>
               </Button>
               <Button size="lg" variant="outline" className="h-11 sm:h-12 px-6 sm:px-8 text-sm sm:text-base font-semibold border-border/50 bg-card/30 hover:bg-card/50 w-full sm:w-auto">
                 See How It Works
@@ -151,8 +152,21 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
+            className="max-w-4xl mx-auto"
           >
-            <TextHumanizer />
+            <div className="text-center p-8 sm:p-12 rounded-2xl bg-card/30 border border-border/30">
+              <Ghost className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-2xl sm:text-3xl font-bold mb-4">AI Text Humanizer</h3>
+              <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                Transform your AI-generated text into natural, human-sounding content with our advanced humanization service.
+              </p>
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" asChild>
+                <a href="https://atomwriters.com" target="_blank" rel="noopener noreferrer">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Start Humanizing
+                </a>
+              </Button>
+            </div>
           </motion.div>
         </section>
 
@@ -304,8 +318,10 @@ export default function Home() {
               <p className="text-muted-foreground text-lg mb-8">
                 Start transforming your AI-generated content today. No credit card required.
               </p>
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-12 px-8">
-                Get Started Free
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 h-12 px-8" asChild>
+                <a href="https://atomwriters.com" target="_blank" rel="noopener noreferrer">
+                  Get Started Free
+                </a>
               </Button>
             </motion.div>
           </div>

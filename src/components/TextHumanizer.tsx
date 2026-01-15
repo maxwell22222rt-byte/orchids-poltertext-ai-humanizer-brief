@@ -10,12 +10,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Ghost, Copy, Download, Loader2, Sparkles, RefreshCw, History as HistoryIcon, Clock, ChevronRight, Wand2, AlertCircle, Info } from "lucide-react";
+import { Ghost, Copy, Download, Loader2, Sparkles, RefreshCw, History as HistoryIcon, Clock, ChevronRight, Wand2, AlertCircle, Info, Trash2, CheckSquare, Square } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const TONES = [
   { value: "academic", label: "Academic" },
@@ -101,9 +112,13 @@ export function TextHumanizer() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-    const [activeTab, setActiveTab] = useState("editor");
-    const [warning, setWarning] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [singleDeleteId, setSingleDeleteId] = useState<string | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState("editor");
+  const [warning, setWarning] = useState<string | null>(null);
   const outputTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize output textarea
@@ -148,18 +163,112 @@ export function TextHumanizer() {
 
   const fetchHistory = useCallback(async () => {
     setIsLoadingHistory(true);
+    console.log("[History] Fetching history...");
     try {
-      const response = await fetch("/api/history");
+      const timestamp = Date.now();
+      const response = await fetch(`/api/history?_t=${timestamp}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+          "Pragma": "no-cache",
+        },
+      });
       const data = await response.json();
+      console.log("[History] Received data:", data);
       if (data.history) {
         setHistory(data.history);
+        console.log("[History] Set", data.history.length, "items");
       }
     } catch (error) {
-      console.error("Failed to fetch history:", error);
+      console.error("[History] Failed to fetch:", error);
     } finally {
       setIsLoadingHistory(false);
     }
   }, []);
+
+  // Selection functions for bulk delete
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const selectAll = () => {
+    setSelectedIds(new Set(history.map((h) => h.id)));
+  };
+
+  const deselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  // Delete selected history items
+  const deleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+
+    setIsDeleting(true);
+    console.log("[History] Deleting selected items:", Array.from(selectedIds));
+
+    try {
+      const response = await fetch("/api/history", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      });
+
+      const data = await response.json();
+      console.log("[History] Delete response:", data);
+
+      if (data.success) {
+        setHistory((prev) => prev.filter((h) => !selectedIds.has(h.id)));
+        setSelectedIds(new Set());
+        console.log("[History] Deleted", data.deletedCount, "items");
+      }
+    } catch (error) {
+      console.error("[History] Delete error:", error);
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  // Delete single item
+  const deleteSingleItem = async () => {
+    if (!singleDeleteId) return;
+
+    setIsDeleting(true);
+    console.log("[History] Deleting item:", singleDeleteId);
+
+    try {
+      const response = await fetch("/api/history", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [singleDeleteId] }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setHistory((prev) => prev.filter((h) => h.id !== singleDeleteId));
+        setSelectedIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(singleDeleteId);
+          return newSet;
+        });
+        console.log("[History] Deleted item successfully");
+      }
+    } catch (error) {
+      console.error("[History] Delete error:", error);
+    } finally {
+      setIsDeleting(false);
+      setSingleDeleteId(null);
+    }
+  };
 
   useEffect(() => {
     if (activeTab === "history") {
@@ -570,15 +679,71 @@ export function TextHumanizer() {
 
         <TabsContent value="history" className="mt-0">
           <div className="bg-card/30 border border-border/30 rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-border/30 flex items-center justify-between bg-card/50">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary" />
-                Recent Activity
-              </h3>
-              <Button variant="ghost" size="sm" onClick={fetchHistory} disabled={isLoadingHistory}>
-                <RefreshCw className={`w-4 h-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
-              </Button>
+            {/* Header with controls */}
+            <div className="p-4 sm:p-6 border-b border-border/30 bg-card/50">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-primary" />
+                    Recent Activity
+                  </h3>
+                  <Badge variant="outline" className="font-mono text-xs">
+                    {history.length} items
+                  </Badge>
+                  {selectedIds.size > 0 && (
+                    <Badge variant="secondary" className="font-medium text-xs">
+                      {selectedIds.size} selected
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  {history.length > 0 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={selectAll}
+                        disabled={selectedIds.size === history.length}
+                        className="h-8 text-xs"
+                      >
+                        <CheckSquare className="w-3.5 h-3.5 mr-1.5" />
+                        Select All
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={deselectAll}
+                        disabled={selectedIds.size === 0}
+                        className="h-8 text-xs"
+                      >
+                        <Square className="w-3.5 h-3.5 mr-1.5" />
+                        Deselect
+                      </Button>
+                    </>
+                  )}
+
+                  {selectedIds.size > 0 && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setDeleteDialogOpen(true)}
+                      disabled={isDeleting}
+                      className="h-8 text-xs"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                      Delete ({selectedIds.size})
+                    </Button>
+                  )}
+
+                  <Button variant="ghost" size="sm" onClick={fetchHistory} disabled={isLoadingHistory} className="h-8">
+                    <RefreshCw className={`w-4 h-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
+                  </Button>
+                </div>
+              </div>
             </div>
+
+            {/* History List */}
             <div className="divide-y divide-border/30 max-h-[600px] overflow-y-auto">
               {isLoadingHistory ? (
                 <div className="p-12 flex flex-col items-center justify-center gap-3">
@@ -588,49 +753,154 @@ export function TextHumanizer() {
               ) : history.length === 0 ? (
                 <div className="p-20 text-center">
                   <Ghost className="w-16 h-16 text-muted-foreground/20 mx-auto mb-4" />
-                  <p className="text-muted-foreground">No history yet. Start creating!</p>
+                  <p className="text-muted-foreground font-medium">No history yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Start humanizing to see your history here</p>
                 </div>
               ) : (
-                history.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-4 hover:bg-primary/5 transition-colors cursor-pointer group"
-                    onClick={() => loadFromHistory(item)}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Badge variant="outline" className="text-[10px] font-medium border-primary/30 text-primary">
-                            {item.tone}
-                          </Badge>
-                          <Badge variant="outline" className="text-[10px] font-medium border-border/50">
-                            {item.readability}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                          </span>
+                <AnimatePresence>
+                  {history.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      transition={{ delay: index * 0.02 }}
+                      className={`p-4 hover:bg-primary/5 transition-colors group ${
+                        selectedIds.has(item.id) ? "bg-primary/10" : ""
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        {/* Checkbox */}
+                        <div className="pt-1">
+                          <Checkbox
+                            checked={selectedIds.has(item.id)}
+                            onCheckedChange={() => toggleSelection(item.id)}
+                            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
                         </div>
-                        <p className="text-sm text-muted-foreground font-serif line-clamp-2 mb-2">
-                          "{item.original_text.slice(0, 150)}..."
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                            {item.word_count} words
-                          </span>
-                          <span className="flex items-center gap-1.5 text-primary/70">
-                            <ChevronRight className="w-3 h-3" />
-                            Click to restore
-                          </span>
+
+                        {/* Content */}
+                        <div
+                          className="flex-1 min-w-0 cursor-pointer"
+                          onClick={() => loadFromHistory(item)}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <Badge variant="outline" className="text-[10px] font-medium border-primary/30 text-primary">
+                              {item.tone}
+                            </Badge>
+                            <Badge variant="outline" className="text-[10px] font-medium border-border/50">
+                              {item.readability}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground font-serif line-clamp-2 mb-2">
+                            "{item.original_text.slice(0, 150)}{item.original_text.length > 150 ? "..." : ""}"
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                              {item.word_count} words
+                            </span>
+                            <span className="flex items-center gap-1.5 text-primary/70 group-hover:text-primary transition-colors">
+                              <ChevronRight className="w-3 h-3" />
+                              Click to load
+                            </span>
+                          </div>
                         </div>
+
+                        {/* Individual delete button */}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSingleDeleteId(item.id);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors self-center" />
-                    </div>
-                  </div>
-                ))
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               )}
             </div>
           </div>
+
+          {/* Bulk Delete Confirmation Dialog */}
+          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <Trash2 className="w-5 h-5 text-destructive" />
+                  Delete {selectedIds.size} Item{selectedIds.size > 1 ? "s" : ""}?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete{" "}
+                  <span className="font-semibold">{selectedIds.size}</span> item
+                  {selectedIds.size > 1 ? "s" : ""} from your history.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={deleteSelected}
+                  disabled={isDeleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete {selectedIds.size} Item{selectedIds.size > 1 ? "s" : ""}
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {/* Single Delete Confirmation Dialog */}
+          <AlertDialog open={!!singleDeleteId} onOpenChange={() => setSingleDeleteId(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <Trash2 className="w-5 h-5 text-destructive" />
+                  Delete This Item?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete this item from your history.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={deleteSingleItem}
+                  disabled={isDeleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Item
+                    </>
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </TabsContent>
       </Tabs>
     </div>
