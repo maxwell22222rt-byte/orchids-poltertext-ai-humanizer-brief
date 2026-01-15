@@ -397,20 +397,33 @@ export function TextHumanizer() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {MODELS.map((m) => {
-                      console.log('🔍 Rendering model option:', m.value, m.label);
-                      return (
-                        <SelectItem key={m.value} value={m.value}>
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">{m.label}</span>
-                              <span className="text-xs text-muted-foreground">⚡ {m.speed}</span>
-                            </div>
-                            <span className="text-xs text-muted-foreground">{m.description}</span>
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
+                    <SelectItem value="ghost-mini">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Ghost Mini</span>
+                          <span className="text-xs text-muted-foreground">⚡ 2-5 sec</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">Fast & Efficient</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="ghost-pro">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">Ghost Pro</span>
+                          <span className="text-xs text-muted-foreground">⚡ 5-10 sec</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">Balanced Quality</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="king">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">King</span>
+                          <span className="text-xs text-muted-foreground">⚡ 10-30 sec</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">Maximum Quality</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Tooltip>
